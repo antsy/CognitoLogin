@@ -1,0 +1,53 @@
+<html>
+
+<head>
+    <title>Cognito authentication test</title>
+    <script src="libs/aws-cognito-sdk.min.js"></script>
+    <script src="libs/amazon-cognito-identity.min.js"></script>
+</head>
+
+<body>
+    <table>
+        <tr>
+            <td>Access token:</td>
+            <td><input id="accessToken" type="text" onfocus="this.select();" size="80"></input>
+            </td>
+        </tr>
+        <tr>
+            <td>Identity token:</td>
+            <td><input id="identityToken" type="text" onfocus="this.select();" size="80"></input>
+            </td>
+        </tr>
+    </table>
+
+    <script type="text/javascript">
+        const userName = ''; // Some user from your application pool
+        const userPassword = '';
+        const poolId = ''; // This can be found from the overview page of your user pool configuration
+        const region = ''; // eu-west-1 or whatever
+        const clientId = ''; // This can be found from the 'app clients' -tab of user pool configuration
+
+        (new AWSCognito.CognitoIdentityServiceProvider.CognitoUser({
+            Username: userName,
+            Pool: new AWSCognito.CognitoIdentityServiceProvider.CognitoUserPool({
+                UserPoolId: poolId,
+                ClientId: clientId
+            })
+        })).authenticateUser(new AWSCognito.CognitoIdentityServiceProvider.AuthenticationDetails({
+            Username: userName,
+            Password: userPassword
+        }), {
+                onSuccess: function (result) {
+                    console.log(result);
+                    document.getElementById("accessToken").value = result.getAccessToken().getJwtToken();
+                    document.getElementById("identityToken").value = result.getIdToken().getJwtToken();
+                },
+                onFailure: function (err) {
+                    console.error(err);
+                    document.getElementById("token").value = err;
+                },
+            });
+    </script>
+</body>
+
+</html>
